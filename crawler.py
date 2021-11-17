@@ -1,10 +1,15 @@
 import requests
 from bs4 import BeautifulSoup
 import csv
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 BASE_URL = "https://www.shopetee.com"
 SECTION = "/collections/all-collections"
 FULL_START_URL = BASE_URL + SECTION
+API_KEY = os.getenv('API_KEY')
 
 ENDPOINT = "https://api.webscrapingapi.com/v1/"
 
