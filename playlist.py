@@ -1,6 +1,6 @@
 from youtubesearchpython import PlaylistsSearch
 
-search = PlaylistsSearch('erutan raindancer', limit=12)
+search = PlaylistsSearch('Megadeth	Rust In Peace ', limit=1)
 playlist = search.result()
 for video in playlist['result']:
-    print(video['title'])
+    print(video['link'])
