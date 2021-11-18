@@ -28,24 +28,24 @@ def get_page_source(url, filename):
     return str(body)
     
 
-def extract_products(soup, filename):
+def extract_top_200(soup, filename):
     csv_filename = filename.replace('.txt','.csv')
-    products_file = open(f'musics/metal/{csv_filename}', mode='a', encoding='utf-8', newline='')
-    products_writer = csv.writer(products_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-    products_writer.writerow(['Band', 'Album', 'Year'])
-    products = soup.find_all('table', {'class': 'table table-compact table-striped'})[0].find('tbody')
+    top_200 = open(f'musics/metal/{csv_filename}', mode='a', encoding='utf-8', newline='')
+    top_writer = csv.writer(top_200, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+    top_writer.writerow(['Band', 'Album', 'Year'])
+    tops = soup.find_all('table', {'class': 'table table-compact table-striped'})[0].find('tbody')
 
-    for product in products:
-        base = product.find('td',{'class':'', 'width':'', 'align':''})
+    for top in tops:
+        base = top.find('td',{'class':'', 'width':'', 'align':''})
         band = base.find('b').find('a').getText()
         albums = base.find('div',{'class':'visible-xs'}).find('a').getText()
         years = base.find('div',{'class':'visible-xs'}).find('span').getText()
-        products_writer.writerow([band,albums,years])
+        top_writer.writerow([band,albums,years])
 
 def crawl(url, filename):
     page_body = get_page_source(url, filename)
     soup = BeautifulSoup(page_body, 'html.parser')
-    extract_products(soup, filename)
+    extract_top_200(soup, filename)
 
 crawl(FULL_START_URL,'crawl-top-200.txt')
 
