@@ -32,7 +32,6 @@ def extract_top_200(soup, filename):
     csv_filename = filename.replace('.txt','.csv')
     top_200 = open(f'musics/metal/{csv_filename}', mode='a', encoding='utf-8', newline='')
     top_writer = csv.writer(top_200, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-    top_writer.writerow(['Band', 'Album', 'Year'])
     tops = soup.find_all('table', {'class': 'table table-compact table-striped'})[0].find('tbody')
 
     for top in tops:
