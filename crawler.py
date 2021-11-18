@@ -6,8 +6,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-BASE_URL = "https://www.shopetee.com"
-SECTION = "/collections/all-collections"
+BASE_URL = "https://metalstorm.net"
+SECTION = "/bands/albums_top.php"
 FULL_START_URL = BASE_URL + SECTION
 API_KEY = os.getenv('API_KEY')
 
@@ -27,37 +27,25 @@ def get_page_source(url, filename):
     file_source.close()
     return str(body)
     
-def start_crawling(soup, filename):
-    extract_products(soup, filename)
-    pagination = soup.find('ul',{'class': 'pagination-custom'})
-    next_page = pagination.find_all('li')[-1]
-    if next_page.has_attr('class'):
-        if next_page['class'] == ['disabled']:
-            print("You reached the last page, stopping crawler...")
-    else:
-        next_page_link = next_page.find('a')['href']
-        next_page_address = BASE_URL + next_page_link
-        next_page_index = next_page_link[next_page_link.find('=') + 1 ]
-        crawl(next_page_address, f'etee-page{next_page_index}.txt')
 
-def extract_products(soup, filename):
+def extract_top_200(soup, filename):
     csv_filename = filename.replace('.txt','.csv')
-    products_file = open(f'products/{csv_filename}', mode='a', encoding='utf-8', newline='')
-    products_writer = csv.writer(products_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-    products_writer.writerow(['Title', 'Rating', 'Reviews', 'Price on sale'])
-    products = soup.find_all('div', {'class': 'product-grid-item'})
+    top_200 = open(f'musics/metal/{csv_filename}', mode='a', encoding='utf-8', newline='')
+    top_writer = csv.writer(top_200, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+    top_writer.writerow(['Band', 'Album', 'Year'])
+    tops = soup.find_all('table', {'class': 'table table-compact table-striped'})[0].find('tbody')
 
-    for product in products:
-        product_title = product.find('div', {'class': 'item-title'}).getText().strip()
-        product_rating = product.find('span', {'class': 'jdgm-prev-badge__stars'})['data-score']
-        product_reviews = product.find('span',{'class': 'jdgm-prev-badge__text' }).getText().strip()
-        product_price_on_sale = product.find('span', {'class': 'money'}).getText()
-        products_writer.writerow([product_title, product_rating, product_reviews, product_price_on_sale])
+    for top in tops:
+        base = top.find('td',{'class':'', 'width':'', 'align':''})
+        band = base.find('b').find('a').getText()
+        albums = base.find('div',{'class':'visible-xs'}).find('a').getText()
+        years = base.find('div',{'class':'visible-xs'}).find('span').getText()
+        top_writer.writerow([band,albums,years])
 
 def crawl(url, filename):
     page_body = get_page_source(url, filename)
     soup = BeautifulSoup(page_body, 'html.parser')
-    start_crawling(soup, filename)
+    extract_top_200(soup, filename)
 
-crawl(FULL_START_URL,'etee-page1.txt')
+crawl(FULL_START_URL,'crawl-top-200.txt')
 
